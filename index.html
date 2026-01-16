@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1F1F1F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Event Check-In & Walk-In Management System">
+    <title>The Sound Nexus - Check-In</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
+
+    <!-- Preconnect for faster CDN loading -->
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header__content">
+            <div class="header__brand">
+                <h1 class="header__title" id="eventName">The Sound Nexus</h1>
+                <span class="header__date" id="eventDate">Jan 17, 2026</span>
+            </div>
+            <div class="header__status">
+                <span class="badge badge--offline" id="offlineBadge">OFFLINE</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav" id="mainNav">
+        <button class="nav__btn nav__btn--active" data-tab="scanner">
+            <svg class="nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+            <span class="nav__label">Scanner</span>
+        </button>
+        <button class="nav__btn" data-tab="walkin">
+            <svg class="nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="nav__label">Walk-In</span>
+            <span class="nav__badge" id="walkinBadge"></span>
+        </button>
+        <button class="nav__btn" data-tab="dashboard">
+            <svg class="nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span class="nav__label">Dashboard</span>
+        </button>
+        <button class="nav__btn" data-tab="settings">
+            <svg class="nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span class="nav__label">Settings</span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Scanner Tab -->
+        <section class="tab tab--active" id="scannerTab">
+            <div class="card">
+                <div class="scanner">
+                    <div class="scanner__viewport" id="scannerViewport"></div>
+                    <div class="scanner__overlay" id="scannerOverlay">
+                        <div class="scanner__placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <circle cx="12" cy="13" r="3" />
+                            </svg>
+                            <p>Tap Start to begin scanning</p>
+                        </div>
+                    </div>
+                    <div class="scanner__frame" id="scannerFrame">
+                        <div class="scanner__corner scanner__corner--tl"></div>
+                        <div class="scanner__corner scanner__corner--tr"></div>
+                        <div class="scanner__corner scanner__corner--bl"></div>
+                        <div class="scanner__corner scanner__corner--br"></div>
+                        <div class="scanner__line"></div>
+                    </div>
+                </div>
+                <div class="scanner__controls">
+                    <button class="btn btn--success" id="btnStartScanner">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        Start Scanner
+                    </button>
+                    <button class="btn btn--secondary" id="btnStopScanner" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="6" y="6" width="12" height="12" />
+                        </svg>
+                        Stop
+                    </button>
+                    <button class="btn btn--icon btn--secondary" id="btnTorch" disabled title="Toggle Torch">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scan Result -->
+            <div class="scan-result" id="scanResult">
+                <div class="scan-result__icon" id="scanResultIcon"></div>
+                <div class="scan-result__name" id="scanResultName"></div>
+                <div class="scan-result__detail" id="scanResultDetail"></div>
+                <div class="scan-result__meta" id="scanResultMeta"></div>
+            </div>
+
+            <!-- Manual Entry -->
+            <div class="card">
+                <h3 class="card__title">Manual Entry</h3>
+                <div class="input-group">
+                    <input type="text" class="input" id="manualIdInput" placeholder="Enter Ticket ID">
+                    <button class="btn btn--primary" id="btnManualCheckin">Check In</button>
+                </div>
+            </div>
+
+            <!-- Scan History -->
+            <div class="card">
+                <h3 class="card__title">Recent Scans</h3>
+                <div class="scan-history" id="scanHistory">
+                    <div class="empty-state empty-state--sm">
+                        <p>No scans yet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Walk-In Tab -->
+        <section class="tab" id="walkinTab">
+            <!-- Payment QR Section -->
+            <div class="card">
+                <h3 class="card__title">Collect Payment</h3>
+                <div class="qr-section">
+                    <!-- Price Info -->
+                    <div class="payment-info">
+                        <div class="payment-info__price">
+                            <span class="payment-info__label">Ticket Price</span>
+                            <span class="payment-info__amount" id="basePrice">₹255</span>
+                        </div>
+                        <p class="payment-info__note">Customer can select quantity on payment page</p>
+                    </div>
+
+                    <!-- QR Code Display (always visible) -->
+                    <div class="qr-display show" id="qrDisplay">
+                        <div id="qrCanvas"></div>
+                    </div>
+                    <p class="qr-instruction">Scan to pay via UPI/Cards</p>
+
+                    <!-- Copy Link Button -->
+                    <button class="btn btn--secondary btn--block" id="btnCopyLink">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                        Copy Payment Link
+                    </button>
+                </div>
+            </div>
+
+            <!-- Walk-In Form -->
+            <div class="card">
+                <h3 class="card__title">Log Walk-In Customer</h3>
+                <form class="form" id="walkinForm">
+                    <div class="form__group">
+                        <label class="label">Customer Name <span class="required">*</span></label>
+                        <input type="text" class="input" id="walkinName" placeholder="Enter name" required>
+                    </div>
+                    <div class="form__group">
+                        <label class="label">Tickets</label>
+                        <div class="qty-control">
+                            <button type="button" class="btn btn--icon btn--secondary" id="btnQtyMinus">−</button>
+                            <span class="qty-control__value" id="qtyValue">1</span>
+                            <button type="button" class="btn btn--icon btn--secondary" id="btnQtyPlus">+</button>
+                            <span class="qty-control__total" id="qtyTotal">= ₹255</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn--success btn--block">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        Log Walk-In
+                    </button>
+                </form>
+
+                <!-- Walk-In Stats -->
+                <div class="stats-row">
+                    <div class="stat-mini">
+                        <span class="stat-mini__value" id="walkinCount">0</span>
+                        <span class="stat-mini__label">Walk-Ins</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="stat-mini__value" id="walkinRevenue">₹0</span>
+                        <span class="stat-mini__label">Revenue</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Walk-Ins -->
+            <div class="card">
+                <h3 class="card__title">Recent Walk-Ins</h3>
+                <div class="walkin-list" id="walkinList">
+                    <div class="empty-state empty-state--sm">
+                        <p>No walk-ins yet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Tab -->
+        <section class="tab" id="dashboardTab">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-card__value" id="statRegistered">0</span>
+                    <span class="stat-card__label">Pre-Registered</span>
+                </div>
+                <div class="stat-card stat-card--highlight">
+                    <span class="stat-card__value" id="statCheckedIn">0</span>
+                    <span class="stat-card__label">Checked In</span>
+                    <span class="stat-card__sub" id="statPercentage">0%</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card__value" id="statWalkins">0</span>
+                    <span class="stat-card__label">Walk-Ins</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card__value" id="statRevenue">₹0</span>
+                    <span class="stat-card__label">Revenue</span>
+                </div>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="search-bar">
+                <input type="text" class="input" id="searchInput" placeholder="Search name, ID, phone...">
+                <select class="select" id="filterSelect">
+                    <option value="all">All</option>
+                    <option value="checked">Checked In</option>
+                    <option value="unchecked">Not Checked</option>
+                    <option value="walkins">Walk-Ins</option>
+                </select>
+            </div>
+
+            <!-- Attendee List -->
+            <div class="attendee-list" id="attendeeList"></div>
+
+            <!-- Export Section -->
+            <div class="card">
+                <h3 class="card__title">Export Data</h3>
+                <div class="btn-grid">
+                    <button class="btn btn--secondary" id="btnExportAll">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Full Backup
+                    </button>
+                    <button class="btn btn--secondary" id="btnExportCheckin">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Check-In CSV
+                    </button>
+                    <button class="btn btn--secondary" id="btnExportWalkins">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857" />
+                        </svg>
+                        Walk-Ins CSV
+                    </button>
+                    <button class="btn btn--secondary" id="btnExportSummary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Summary
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Tab -->
+        <section class="tab" id="settingsTab">
+            <!-- Event Config -->
+            <div class="card">
+                <h3 class="card__title">Event Configuration</h3>
+                <form class="form" id="configForm">
+                    <div class="form__group">
+                        <label class="label">Event Name</label>
+                        <input type="text" class="input" id="configEventName" value="The Sound Nexus">
+                    </div>
+                    <div class="form__group">
+                        <label class="label">Event Date</label>
+                        <input type="date" class="input" id="configEventDate" value="2026-01-17">
+                    </div>
+                    <div class="form__group">
+                        <label class="label">Ticket Price (₹)</label>
+                        <input type="number" class="input" id="configTicketPrice" value="255" min="0">
+                    </div>
+                    <div class="form__group">
+                        <label class="label">UPI Payment Link</label>
+                        <input type="url" class="input" id="configUpiLink" placeholder="https://razorpay.me/...">
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--block">Save Configuration</button>
+                </form>
+            </div>
+
+            <!-- Import -->
+            <div class="card">
+                <h3 class="card__title">Import Attendees</h3>
+                <div class="drop-zone" id="dropZone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p>Drop JSON/CSV file here</p>
+                    <span>or tap to browse</span>
+                    <input type="file" id="importFile" accept=".json,.csv" hidden>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card card--danger">
+                <h3 class="card__title card__title--danger">Danger Zone</h3>
+                <div class="form__group">
+                    <button class="btn btn--secondary btn--block" id="btnResetCheckins">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Reset All Check-Ins
+                    </button>
+                </div>
+                <div class="form__group">
+                    <label class="label label--danger">Type DELETE to clear all data</label>
+                    <input type="text" class="input" id="deleteConfirm" placeholder="Type DELETE">
+                </div>
+                <button class="btn btn--danger btn--block" id="btnClearAll">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Clear All Data
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Stats Bar -->
+    <footer class="footer">
+        <div class="footer__stat">
+            <span class="footer__value" id="footerCheckedIn">0/0</span>
+            <span class="footer__label">Checked In</span>
+        </div>
+        <div class="footer__stat">
+            <span class="footer__value" id="footerWalkins">0</span>
+            <span class="footer__label">Walk-Ins</span>
+        </div>
+        <div class="footer__stat">
+            <span class="footer__value" id="footerRevenue">₹0</span>
+            <span class="footer__label">Revenue</span>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal__content">
+            <div class="modal__icon" id="modalIcon"></div>
+            <h2 class="modal__title" id="modalTitle"></h2>
+            <div class="modal__body" id="modalBody"></div>
+            <div class="modal__actions" id="modalActions"></div>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@latest/qrcode.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/scanner.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
