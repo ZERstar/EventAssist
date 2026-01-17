@@ -15,6 +15,8 @@ const App = (function () {
     let config = {};
     let walkInQty = 1;
     let currentPaymentType = 'regular';
+    let regularQRGenerated = false;
+    let growthxQRGenerated = false;
 
     /**
      * Initialize the application
@@ -42,10 +44,30 @@ const App = (function () {
         // Initial render
         render();
 
-        // Generate QR codes for both payment types
-        generatePaymentQRs();
-
         console.log('🎵 Event Assist initialized');
+        console.log('📱 Test IDs: REG-001, REG-002, REG-003, REG-004, REG-005');
+    }
+
+    /**
+     * Wait for QRCode library to be available
+     */
+    function waitForQRLibrary(callback, maxAttempts = 20) {
+        let attempts = 0;
+
+        function check() {
+            attempts++;
+            if (typeof QRCode !== 'undefined') {
+                console.log('QRCode library loaded after', attempts, 'attempts');
+                callback();
+            } else if (attempts < maxAttempts) {
+                setTimeout(check, 100);
+            } else {
+                console.error('QRCode library failed to load after', maxAttempts, 'attempts');
+                UI.showToast('QR library failed to load. Please refresh.', 'error');
+            }
+        }
+
+        check();
     }
 
     /**
@@ -59,11 +81,21 @@ const App = (function () {
         UI.updateStats(stats, config);
         UI.populateSettings(config);
         UI.updateWalkInBadge(stats.walkIns);
-        UI.updateQuantity(walkInQty, config.ticketPrice);
+        UI.updateQuantity(walkInQty, getCurrentTicketPrice());
         updatePriceDisplays();
 
         renderAttendeeList();
         renderWalkInList();
+    }
+
+    /**
+     * Get current ticket price based on selected payment type
+     */
+    function getCurrentTicketPrice() {
+        if (currentPaymentType === 'growthx') {
+            return config.growthxPrice || 219;
+        }
+        return config.ticketPrice || 255;
     }
 
     /**
@@ -84,19 +116,34 @@ const App = (function () {
     }
 
     /**
-     * Generate QR codes for both payment types
+     * Generate Regular payment QR code
      */
-    function generatePaymentQRs() {
-        // Regular QR
-        const regularCanvas = document.getElementById('qrCanvasRegular');
-        if (regularCanvas) {
-            Scanner.generateQR(regularCanvas, PAYMENT_LINKS.regular);
-        }
+    function generateRegularQR() {
+        if (regularQRGenerated) return;
 
-        // GrowthX QR
-        const growthxCanvas = document.getElementById('qrCanvasGrowthX');
-        if (growthxCanvas) {
-            Scanner.generateQR(growthxCanvas, PAYMENT_LINKS.growthx);
+        const container = document.getElementById('qrCanvasRegular');
+        if (container) {
+            const success = Scanner.generateQR(container, PAYMENT_LINKS.regular);
+            if (success) {
+                regularQRGenerated = true;
+                console.log('Regular QR generated');
+            }
+        }
+    }
+
+    /**
+     * Generate GrowthX payment QR code
+     */
+    function generateGrowthXQR() {
+        if (growthxQRGenerated) return;
+
+        const container = document.getElementById('qrCanvasGrowthX');
+        if (container) {
+            const success = Scanner.generateQR(container, PAYMENT_LINKS.growthx);
+            if (success) {
+                growthxQRGenerated = true;
+                console.log('GrowthX QR generated');
+            }
         }
     }
 
@@ -120,6 +167,13 @@ const App = (function () {
                 // Refresh dashboard when switching to it
                 if (tab === 'dashboard') {
                     renderAttendeeList();
+                }
+
+                // Generate Regular QR when walk-in tab is first opened
+                if (tab === 'walkin' && !regularQRGenerated) {
+                    waitForQRLibrary(() => {
+                        generateRegularQR();
+                    });
                 }
             });
         });
@@ -235,14 +289,14 @@ const App = (function () {
         elements.btnMinus.addEventListener('click', () => {
             if (walkInQty > 1) {
                 walkInQty--;
-                UI.updateQuantity(walkInQty, config.ticketPrice);
+                UI.updateQuantity(walkInQty, getCurrentTicketPrice());
             }
         });
 
         elements.btnPlus.addEventListener('click', () => {
             if (walkInQty < 10) {
                 walkInQty++;
-                UI.updateQuantity(walkInQty, config.ticketPrice);
+                UI.updateQuantity(walkInQty, getCurrentTicketPrice());
             }
         });
 
@@ -257,13 +311,17 @@ const App = (function () {
                 return;
             }
 
+            const ticketType = currentPaymentType === 'growthx' ? 'GrowthX Walk-In' : 'Walk-In';
             const walkIn = Storage.addWalkIn({
                 name,
-                quantity: walkInQty
+                quantity: walkInQty,
+                pricePerTicket: getCurrentTicketPrice(),
+                ticketType
             });
 
             if (walkIn) {
-                UI.showToast(`Walk-in logged: ${name}`, 'success');
+                const priceLabel = currentPaymentType === 'growthx' ? 'GrowthX' : 'Regular';
+                UI.showToast(`${priceLabel} walk-in logged: ${name}`, 'success');
 
                 // Reset form
                 elements.nameInput.value = '';
@@ -314,6 +372,16 @@ const App = (function () {
             if (indicator) {
                 indicator.classList.toggle('slide-right', type === 'growthx');
             }
+
+            // Generate GrowthX QR when that panel is first shown
+            if (type === 'growthx' && !growthxQRGenerated) {
+                waitForQRLibrary(() => {
+                    generateGrowthXQR();
+                });
+            }
+
+            // Update quantity display with new price
+            UI.updateQuantity(walkInQty, getCurrentTicketPrice());
         }
 
         // Copy link handlers

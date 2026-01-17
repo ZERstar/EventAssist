@@ -192,14 +192,15 @@ const Storage = (function () {
      * Add a walk-in
      */
     function addWalkIn(data) {
+        const pricePerTicket = data.pricePerTicket || appData.config.ticketPrice;
         const walkIn = {
             id: `WALKIN-${Date.now()}`,
             name: data.name,
             phone: null,
             email: null,
-            ticketType: 'Walk-In',
+            ticketType: data.ticketType || 'Walk-In',
             quantity: data.quantity,
-            amountPaid: data.quantity * appData.config.ticketPrice,
+            amountPaid: data.quantity * pricePerTicket,
             type: 'WALK-IN',
             checkedIn: true,
             checkInTime: new Date().toISOString(),
