@@ -150,30 +150,67 @@
             <!-- Payment QR Section -->
             <div class="card">
                 <h3 class="card__title">Collect Payment</h3>
-                <div class="qr-section">
-                    <!-- Price Info -->
-                    <div class="payment-info">
-                        <div class="payment-info__price">
-                            <span class="payment-info__label">Ticket Price</span>
-                            <span class="payment-info__amount" id="basePrice">₹255</span>
-                        </div>
-                        <p class="payment-info__note">Customer can select quantity on payment page</p>
-                    </div>
 
-                    <!-- QR Code Display (always visible) -->
-                    <div class="qr-display show" id="qrDisplay">
-                        <div id="qrCanvas"></div>
-                    </div>
-                    <p class="qr-instruction">Scan to pay via UPI/Cards</p>
-
-                    <!-- Copy Link Button -->
-                    <button class="btn btn--secondary btn--block" id="btnCopyLink">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path
-                                d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                        </svg>
-                        Copy Payment Link
+                <!-- Payment Type Tabs -->
+                <div class="payment-tabs">
+                    <button class="payment-tab payment-tab--active" data-payment="regular" id="tabRegular">
+                        <span class="payment-tab__icon">🎫</span>
+                        <span class="payment-tab__label">Regular</span>
                     </button>
+                    <button class="payment-tab" data-payment="growthx" id="tabGrowthX">
+                        <span class="payment-tab__icon">🚀</span>
+                        <span class="payment-tab__label">GrowthX</span>
+                    </button>
+                    <div class="payment-tabs__indicator" id="tabIndicator"></div>
+                </div>
+
+                <!-- Regular Payment Panel -->
+                <div class="payment-panel payment-panel--active" id="panelRegular">
+                    <div class="qr-section">
+                        <div class="payment-info">
+                            <div class="payment-info__price">
+                                <span class="payment-info__label">Ticket Price</span>
+                                <span class="payment-info__amount" id="basePrice">₹255</span>
+                            </div>
+                            <p class="payment-info__note">On-the-spot registration</p>
+                        </div>
+                        <div class="qr-display show" id="qrDisplayRegular">
+                            <div id="qrCanvasRegular"></div>
+                        </div>
+                        <p class="qr-instruction">Scan to pay via UPI/Cards</p>
+                        <button class="btn btn--secondary btn--block" id="btnCopyLinkRegular">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            Copy Payment Link
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GrowthX Payment Panel -->
+                <div class="payment-panel" id="panelGrowthX">
+                    <div class="qr-section">
+                        <div class="payment-info payment-info--growthx">
+                            <div class="payment-info__badge">GrowthX Partner</div>
+                            <div class="payment-info__price">
+                                <span class="payment-info__label">Special Rate</span>
+                                <span class="payment-info__amount" id="growthxPrice">₹255</span>
+                            </div>
+                            <p class="payment-info__note">GrowthX community members</p>
+                        </div>
+                        <div class="qr-display show" id="qrDisplayGrowthX">
+                            <div id="qrCanvasGrowthX"></div>
+                        </div>
+                        <p class="qr-instruction">Scan to pay via UPI/Cards</p>
+                        <button class="btn btn--secondary btn--block" id="btnCopyLinkGrowthX">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            Copy Payment Link
+                        </button>
+                    </div>
                 </div>
             </div>
 

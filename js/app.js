@@ -6,19 +6,15 @@
 const App = (function () {
     'use strict';
 
-    // Cashfree payment link with built-in item counter
-    const PAYMENT_LINK = 'https://payments.cashfree.com/forms/the-sound-nexus-ots';
+    // Payment links
+    const PAYMENT_LINKS = {
+        regular: 'https://payments.cashfree.com/forms/the-sound-nexus-ots',
+        growthx: 'https://payments.cashfree.com/forms?code=the-sound-nexus-growthX'
+    };
 
     let config = {};
     let walkInQty = 1;
-    let paymentQty = 1;  // For display reference only
-
-    /**
-     * Get the payment link
-     */
-    function getPaymentLink() {
-        return PAYMENT_LINK;
-    }
+    let currentPaymentType = 'regular';
 
     /**
      * Initialize the application
@@ -38,7 +34,7 @@ const App = (function () {
         setupNavigation();
         setupScanner();
         setupWalkIn();
-        setupPayment();  // New: setup payment section
+        setupPaymentTabs();
         setupDashboard();
         setupSettings();
         setupOfflineDetection();
@@ -46,8 +42,8 @@ const App = (function () {
         // Initial render
         render();
 
-        // Generate QR code on load
-        generatePaymentQR();
+        // Generate QR codes for both payment types
+        generatePaymentQRs();
 
         console.log('🎵 Event Assist initialized');
     }
@@ -64,18 +60,26 @@ const App = (function () {
         UI.populateSettings(config);
         UI.updateWalkInBadge(stats.walkIns);
         UI.updateQuantity(walkInQty, config.ticketPrice);
-        UI.updatePaymentDisplay(paymentQty, config.ticketPrice);
 
         renderAttendeeList();
         renderWalkInList();
     }
 
     /**
-     * Generate payment QR code
+     * Generate QR codes for both payment types
      */
-    function generatePaymentQR() {
-        const elements = UI.getElements();
-        Scanner.generateQR(elements.walkin.qrCanvas, PAYMENT_LINK);
+    function generatePaymentQRs() {
+        // Regular QR
+        const regularCanvas = document.getElementById('qrCanvasRegular');
+        if (regularCanvas) {
+            Scanner.generateQR(regularCanvas, PAYMENT_LINKS.regular);
+        }
+
+        // GrowthX QR
+        const growthxCanvas = document.getElementById('qrCanvasGrowthX');
+        if (growthxCanvas) {
+            Scanner.generateQR(growthxCanvas, PAYMENT_LINKS.growthx);
+        }
     }
 
 
@@ -253,48 +257,77 @@ const App = (function () {
     }
 
     /**
-     * Set up payment section with quantity controls and copy link
+     * Set up payment tabs with sliding indicator
      */
-    function setupPayment() {
-        const elements = UI.getElements().walkin;
+    function setupPaymentTabs() {
+        const tabRegular = document.getElementById('tabRegular');
+        const tabGrowthX = document.getElementById('tabGrowthX');
+        const panelRegular = document.getElementById('panelRegular');
+        const panelGrowthX = document.getElementById('panelGrowthX');
+        const indicator = document.getElementById('tabIndicator');
+        const btnCopyRegular = document.getElementById('btnCopyLinkRegular');
+        const btnCopyGrowthX = document.getElementById('btnCopyLinkGrowthX');
 
-        // Payment quantity controls (+ / -) - for reference display only
-        // The actual quantity is selected on the Cashfree payment form
-        if (elements.btnPayQtyMinus) {
-            elements.btnPayQtyMinus.addEventListener('click', () => {
-                if (paymentQty > 1) {
-                    paymentQty--;
-                    UI.updatePaymentDisplay(paymentQty, config.ticketPrice);
-                }
+        // Tab switching
+        if (tabRegular) {
+            tabRegular.addEventListener('click', () => {
+                switchPaymentTab('regular');
             });
         }
 
-        if (elements.btnPayQtyPlus) {
-            elements.btnPayQtyPlus.addEventListener('click', () => {
-                if (paymentQty < 20) {
-                    paymentQty++;
-                    UI.updatePaymentDisplay(paymentQty, config.ticketPrice);
-                }
+        if (tabGrowthX) {
+            tabGrowthX.addEventListener('click', () => {
+                switchPaymentTab('growthx');
             });
         }
 
-        // Copy link button - copies the Cashfree payment form link
-        if (elements.btnCopyLink) {
-            elements.btnCopyLink.addEventListener('click', async () => {
-                try {
-                    await navigator.clipboard.writeText(PAYMENT_LINK);
-                    UI.showToast('Payment link copied!', 'success');
-                } catch (e) {
-                    // Fallback for older browsers
-                    const textArea = document.createElement('textarea');
-                    textArea.value = PAYMENT_LINK;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    UI.showToast('Payment link copied!', 'success');
-                }
+        function switchPaymentTab(type) {
+            currentPaymentType = type;
+
+            // Update tab active states
+            tabRegular.classList.toggle('payment-tab--active', type === 'regular');
+            tabGrowthX.classList.toggle('payment-tab--active', type === 'growthx');
+
+            // Update panel visibility
+            panelRegular.classList.toggle('payment-panel--active', type === 'regular');
+            panelGrowthX.classList.toggle('payment-panel--active', type === 'growthx');
+
+            // Slide indicator
+            if (indicator) {
+                indicator.classList.toggle('slide-right', type === 'growthx');
+            }
+        }
+
+        // Copy link handlers
+        if (btnCopyRegular) {
+            btnCopyRegular.addEventListener('click', () => {
+                copyToClipboard(PAYMENT_LINKS.regular, 'Regular payment link copied!');
             });
+        }
+
+        if (btnCopyGrowthX) {
+            btnCopyGrowthX.addEventListener('click', () => {
+                copyToClipboard(PAYMENT_LINKS.growthx, 'GrowthX payment link copied!');
+            });
+        }
+    }
+
+    /**
+     * Copy text to clipboard with toast notification
+     */
+    async function copyToClipboard(text, message) {
+        try {
+            await navigator.clipboard.writeText(text);
+            UI.showToast(message, 'success');
+        } catch (e) {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            UI.showToast(message, 'success');
         }
     }
 
