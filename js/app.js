@@ -60,9 +60,27 @@ const App = (function () {
         UI.populateSettings(config);
         UI.updateWalkInBadge(stats.walkIns);
         UI.updateQuantity(walkInQty, config.ticketPrice);
+        updatePriceDisplays();
 
         renderAttendeeList();
         renderWalkInList();
+    }
+
+    /**
+     * Update all price displays dynamically
+     */
+    function updatePriceDisplays() {
+        // Regular price
+        const basePrice = document.getElementById('basePrice');
+        if (basePrice) {
+            basePrice.textContent = UI.formatCurrency(config.ticketPrice);
+        }
+
+        // GrowthX price
+        const growthxPrice = document.getElementById('growthxPrice');
+        if (growthxPrice) {
+            growthxPrice.textContent = UI.formatCurrency(config.growthxPrice);
+        }
     }
 
     /**
@@ -466,6 +484,7 @@ const App = (function () {
                 eventName: elements.eventName.value.trim(),
                 eventDate: elements.eventDate.value,
                 ticketPrice: parseInt(elements.ticketPrice.value) || 0,
+                growthxPrice: parseInt(elements.growthxPrice.value) || 0,
                 upiLink: elements.upiLink.value.trim()
             };
 

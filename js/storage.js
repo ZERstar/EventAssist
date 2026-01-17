@@ -3,7 +3,7 @@
  * Handles all localStorage operations and data management
  */
 
-const Storage = (function() {
+const Storage = (function () {
     'use strict';
 
     const STORAGE_KEY = 'soundnexus_data';
@@ -13,6 +13,7 @@ const Storage = (function() {
         eventName: 'The Sound Nexus',
         eventDate: '2026-01-17',
         ticketPrice: 255,
+        growthxPrice: 219,
         upiLink: ''
     };
 

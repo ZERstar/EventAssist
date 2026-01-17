@@ -87,6 +87,7 @@ const UI = (function () {
             eventName: document.getElementById('configEventName'),
             eventDate: document.getElementById('configEventDate'),
             ticketPrice: document.getElementById('configTicketPrice'),
+            growthxPrice: document.getElementById('configGrowthxPrice'),
             upiLink: document.getElementById('configUpiLink'),
             dropZone: document.getElementById('dropZone'),
             importFile: document.getElementById('importFile'),
@@ -577,6 +578,7 @@ const UI = (function () {
         elements.settings.eventName.value = config.eventName;
         elements.settings.eventDate.value = config.eventDate;
         elements.settings.ticketPrice.value = config.ticketPrice;
+        elements.settings.growthxPrice.value = config.growthxPrice || 219;
         elements.settings.upiLink.value = config.upiLink || '';
     }
 

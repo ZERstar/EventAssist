@@ -651,6 +651,12 @@ body {
     gap: var(--space-xs);
 }
 
+.form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
 .label {
     font-size: var(--font-size-sm);
     font-weight: 500;
