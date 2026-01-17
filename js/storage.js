@@ -17,70 +17,6 @@ const Storage = (function () {
         upiLink: ''
     };
 
-    // Sample attendees for testing
-    const SAMPLE_ATTENDEES = [
-        {
-            id: 'REG-001',
-            name: 'Priya Sharma',
-            phone: '9876543210',
-            email: 'priya@example.com',
-            ticketType: 'Regular',
-            quantity: 1,
-            amountPaid: 255,
-            type: 'PRE-REG',
-            checkedIn: false,
-            checkInTime: null
-        },
-        {
-            id: 'REG-002',
-            name: 'Rahul Kumar',
-            phone: '9876543211',
-            email: 'rahul@example.com',
-            ticketType: 'Regular',
-            quantity: 2,
-            amountPaid: 510,
-            type: 'PRE-REG',
-            checkedIn: false,
-            checkInTime: null
-        },
-        {
-            id: 'REG-003',
-            name: 'Ananya Patel',
-            phone: '9876543212',
-            email: 'ananya@example.com',
-            ticketType: 'VIP',
-            quantity: 1,
-            amountPaid: 255,
-            type: 'PRE-REG',
-            checkedIn: false,
-            checkInTime: null
-        },
-        {
-            id: 'REG-004',
-            name: 'Vikram Singh',
-            phone: '9876543213',
-            email: 'vikram@example.com',
-            ticketType: 'Regular',
-            quantity: 3,
-            amountPaid: 765,
-            type: 'PRE-REG',
-            checkedIn: false,
-            checkInTime: null
-        },
-        {
-            id: 'REG-005',
-            name: 'Neha Gupta',
-            phone: '9876543214',
-            email: 'neha@example.com',
-            ticketType: 'Regular',
-            quantity: 1,
-            amountPaid: 255,
-            type: 'PRE-REG',
-            checkedIn: false,
-            checkInTime: null
-        }
-    ];
-
     // Current app data
     let appData = {
         config: { ...DEFAULT_CONFIG },
@@ -100,13 +36,11 @@ const Storage = (function () {
                     attendees: parsed.attendees || []
                 };
             } else {
-                // First time - load sample data
-                appData.attendees = [...SAMPLE_ATTENDEES];
+                // First time - start fresh
                 save();
             }
         } catch (e) {
             console.error('Error loading data:', e);
-            appData.attendees = [...SAMPLE_ATTENDEES];
             save();
         }
         return appData;
@@ -275,7 +209,7 @@ const Storage = (function () {
         localStorage.removeItem(STORAGE_KEY);
         appData = {
             config: { ...DEFAULT_CONFIG },
-            attendees: [...SAMPLE_ATTENDEES]
+            attendees: []
         };
         save();
     }
