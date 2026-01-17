@@ -428,6 +428,9 @@ const UI = (function () {
      * Get status badge HTML
      */
     function getStatusBadge(attendee) {
+        if (attendee.type === 'MANUAL') {
+            return '<span class="status-badge status-badge--manual">📝 Manual Entry</span>';
+        }
         if (attendee.type === 'WALK-IN') {
             return '<span class="status-badge status-badge--walkin">Walk-In</span>';
         }
@@ -441,6 +444,9 @@ const UI = (function () {
      * Get action buttons HTML
      */
     function getActionButtons(attendee) {
+        if (attendee.type === 'MANUAL') {
+            return '<button class="btn btn--danger btn-remove" data-id="' + attendee.id + '">Remove Entry</button>';
+        }
         if (attendee.type === 'WALK-IN') {
             return '<button class="btn btn--danger btn-remove" data-id="' + attendee.id + '">Remove Walk-In</button>';
         }

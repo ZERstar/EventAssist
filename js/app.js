@@ -202,9 +202,24 @@ const App = (function () {
 
         // Manual check-in
         elements.btnManual.addEventListener('click', () => {
-            const ticketId = elements.manualInput.value.trim();
-            if (ticketId) {
-                handleScanResult(ticketId);
+            const username = elements.manualInput.value.trim();
+            if (username) {
+                const entry = Storage.addManualEntry(username);
+                if (entry) {
+                    UI.showScanResult({
+                        type: 'success',
+                        name: entry.name,
+                        detail: 'Manual Entry',
+                        meta: UI.formatTime(entry.checkInTime)
+                    });
+                    UI.addScanHistory({
+                        type: 'success',
+                        name: entry.name,
+                        time: entry.checkInTime
+                    });
+                    UI.showToast(`${entry.name} logged!`, 'success');
+                    render();
+                }
                 elements.manualInput.value = '';
             } else {
                 elements.manualInput.classList.add('error');
@@ -223,58 +238,23 @@ const App = (function () {
     /**
      * Handle scan result
      */
-    function handleScanResult(ticketId) {
-        const attendee = Storage.findAttendee(ticketId);
+    function handleScanResult(scannedData) {
+        // Simply log whatever is scanned as a manual entry
+        const entry = Storage.addManualEntry(scannedData);
 
-        if (!attendee) {
-            // Not found
-            UI.showScanResult({
-                type: 'error',
-                name: 'Not Found',
-                detail: `Ticket ID: ${ticketId}`,
-                meta: 'This ticket is not in the system'
-            });
-            UI.addScanHistory({
-                type: 'error',
-                name: ticketId,
-                time: new Date().toISOString()
-            });
-            UI.showToast('Ticket not found', 'error');
-            return;
-        }
-
-        if (attendee.checkedIn) {
-            // Already checked in
-            UI.showScanResult({
-                type: 'warning',
-                name: attendee.name,
-                detail: attendee.ticketType,
-                meta: `Already checked in at ${UI.formatTime(attendee.checkInTime)}`
-            });
-            UI.addScanHistory({
-                type: 'warning',
-                name: attendee.name,
-                time: new Date().toISOString()
-            });
-            UI.showToast('Already checked in', 'warning');
-            return;
-        }
-
-        // Check in
-        const result = Storage.checkIn(attendee.id);
-        if (result) {
+        if (entry) {
             UI.showScanResult({
                 type: 'success',
-                name: result.name,
-                detail: `${result.ticketType} • ${result.quantity} ticket${result.quantity > 1 ? 's' : ''}`,
-                meta: UI.formatCurrency(result.amountPaid)
+                name: entry.name,
+                detail: 'Scanned Entry',
+                meta: UI.formatTime(entry.checkInTime)
             });
             UI.addScanHistory({
                 type: 'success',
-                name: result.name,
-                time: result.checkInTime
+                name: entry.name,
+                time: entry.checkInTime
             });
-            UI.showToast(`${result.name} checked in!`, 'success');
+            UI.showToast(`${entry.name} logged!`, 'success');
             render();
         }
     }
@@ -528,13 +508,28 @@ const App = (function () {
     }
 
     /**
-     * Handle remove walk-in
+     * Handle remove walk-in or manual entry
      */
     function handleRemoveWalkIn(id) {
-        const result = Storage.removeWalkIn(id);
-        if (result) {
-            UI.showToast('Walk-in removed', 'success');
-            render();
+        // Try to find the attendee to determine type
+        const attendees = Storage.getAttendees();
+        const attendee = attendees.find(a => a.id === id);
+
+        if (!attendee) return;
+
+        let result;
+        if (attendee.type === 'MANUAL') {
+            result = Storage.removeManualEntry(id);
+            if (result) {
+                UI.showToast('Manual entry removed', 'success');
+                render();
+            }
+        } else if (attendee.type === 'WALK-IN') {
+            result = Storage.removeWalkIn(id);
+            if (result) {
+                UI.showToast('Walk-in removed', 'success');
+                render();
+            }
         }
     }
 

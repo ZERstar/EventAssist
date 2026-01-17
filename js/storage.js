@@ -123,6 +123,28 @@ const Storage = (function () {
     }
 
     /**
+     * Add a manual entry (username only)
+     */
+    function addManualEntry(username) {
+        const entry = {
+            id: `MANUAL-${Date.now()}`,
+            name: username,
+            phone: null,
+            email: null,
+            ticketType: 'Manual Entry',
+            quantity: 1,
+            amountPaid: 0,
+            type: 'MANUAL',
+            checkedIn: true,
+            checkInTime: new Date().toISOString()
+        };
+
+        appData.attendees.push(entry);
+        save();
+        return entry;
+    }
+
+    /**
      * Add a walk-in
      */
     function addWalkIn(data) {
@@ -144,6 +166,19 @@ const Storage = (function () {
         appData.attendees.push(walkIn);
         save();
         return walkIn;
+    }
+
+    /**
+     * Remove a manual entry
+     */
+    function removeManualEntry(id) {
+        const index = appData.attendees.findIndex(a => a.id === id && a.type === 'MANUAL');
+        if (index > -1) {
+            const removed = appData.attendees.splice(index, 1)[0];
+            save();
+            return removed;
+        }
+        return null;
     }
 
     /**
@@ -255,6 +290,8 @@ const Storage = (function () {
         findAttendee,
         checkIn,
         undoCheckIn,
+        addManualEntry,
+        removeManualEntry,
         addWalkIn,
         removeWalkIn,
         importAttendees,

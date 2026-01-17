@@ -1350,6 +1350,11 @@ body {
     color: var(--color-accent);
 }
 
+.status-badge--manual {
+    background: rgba(147, 51, 234, 0.2);
+    color: #a855f7;
+}
+
 .attendee__time {
     font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
